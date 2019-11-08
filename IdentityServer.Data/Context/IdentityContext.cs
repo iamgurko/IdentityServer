@@ -9,7 +9,6 @@ namespace IdentityServer.Data.Context
         {
                        
         }
-
-        public DbSet<Customer> Customers;
+        public DbSet<Customer> Customers { get; set; }
     }
 }

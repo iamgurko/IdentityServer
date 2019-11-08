@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore.SqlServer;
+
 namespace IdentityServer.API
 {
     public class Startup
@@ -27,6 +27,21 @@ namespace IdentityServer.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication("Bearer")
+                .AddIdentityServerAuthentication(options =>
+                {
+                    options.Authority = "http://localhost:5000";
+                    options.RequireHttpsMetadata = false;
+                    options.ApiName = "IdentityServerAPI";
+                });
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
+            services.AddDbContext<IdentityContext>(options => options.UseInMemoryDatabase("IdentityDb"));
+            services.AddMvc()
+    .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
             services.AddControllers();
         }
 
@@ -41,6 +56,8 @@ namespace IdentityServer.API
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
